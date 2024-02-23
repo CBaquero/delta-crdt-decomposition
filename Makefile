@@ -1,6 +1,6 @@
 CC = g++
 DEBUG = -g -v
-FLAGS = -std=c++17
+FLAGS = -std=c++17 -Wall -Wextra -Wconversion -Wunused -Wshadow -Werror -pedantic
 
 all: gset 2pset
 
