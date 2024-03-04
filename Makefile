@@ -10,8 +10,8 @@ gset: test_gset.cpp gset.cpp gset.h
 2pset: test_2pset.cpp 2pset.h
 	$(CC) $(FLAGS) test_2pset.cpp -o test_2pset
 
-awset: test_awset.cpp awset.h
-	$(CC) $(FLAGS) test_awset.cpp -o test_awset
+lwwset: test_lwwset.cpp lwwset.h
+	$(CC) $(FLAGS) test_lwwset.cpp -o test_lwwset
 	
 clean:
-	rm test_gset test_2pset test_awset
+	rm test_gset test_2pset test_lwwset

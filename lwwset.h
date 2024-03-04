@@ -6,16 +6,16 @@
 #include <vector>
 
 template <typename T, typename Timestamp = unsigned long long>
-class AddWinsSet {
+class LastWriterWinsSet {
   using Tag = std::pair<Timestamp, bool>;
 
 public:
   // idea: provide a mechanism to be either add or remove wins
   // TODO: add quality of life ctors.
-  AddWinsSet() = default;
+  LastWriterWinsSet() = default;
 
-  AddWinsSet<T> insert(const T &value, const Timestamp timestamp) {
-    AddWinsSet<T> delta;
+  LastWriterWinsSet<T> insert(const T &value, const Timestamp timestamp) {
+    LastWriterWinsSet<T> delta;
 
     auto [it, inserted] = m_elements.try_emplace(value, timestamp, true);
 
@@ -36,8 +36,8 @@ public:
     return delta;
   }
 
-  AddWinsSet<T> remove(const T &value, const Timestamp timestamp) {
-    AddWinsSet<T> delta;
+  LastWriterWinsSet<T> remove(const T &value, const Timestamp timestamp) {
+    LastWriterWinsSet<T> delta;
 
     auto [it, inserted] = m_elements.try_emplace(value, timestamp, true);
 
@@ -78,7 +78,7 @@ public:
     join({others...});
   }
 
-  void join(const std::vector<AddWinsSet<T>> &decompositions) {
+  void join(const std::vector<LastWriterWinsSet<T>> &decompositions) {
     for (const auto &set : decompositions) {
       for (const auto &element : set.m_elements) {
         auto [it, inserted] = m_elements.insert(element);
@@ -88,8 +88,8 @@ public:
     }
   }
 
-  std::vector<AddWinsSet<T>> split() const {
-    std::vector<AddWinsSet<T>> decompositions;
+  std::vector<LastWriterWinsSet<T>> split() const {
+    std::vector<LastWriterWinsSet<T>> decompositions;
     decompositions.reserve(m_elements.size());
 
     for (const auto &element : m_elements) {
@@ -100,13 +100,13 @@ public:
     return decompositions;
   }
 
-  bool operator==(const AddWinsSet<T> &other) const {
+  bool operator==(const LastWriterWinsSet<T> &other) const {
     // the semantics of this operator are a bit foggy...
     return elements() == other.elements();
   }
 
-  AddWinsSet<T> operator+(const AddWinsSet<T> &other) const {
-    AddWinsSet<T> result = *this;
+  LastWriterWinsSet<T> operator+(const LastWriterWinsSet<T> &other) const {
+    LastWriterWinsSet<T> result = *this;
 
     for (const auto &element : other.m_elements) {
       auto [it, inserted] = result.m_elements.insert(element);
@@ -117,8 +117,8 @@ public:
     return result;
   }
 
-  AddWinsSet<T> operator-(const AddWinsSet<T> &other) const {
-    AddWinsSet<T> result = *this;
+  LastWriterWinsSet<T> operator-(const LastWriterWinsSet<T> &other) const {
+    LastWriterWinsSet<T> result = *this;
 
     for (const auto &[value, tag] : other.m_elements) {
       // element is not present in the remote set, keep it
@@ -141,7 +141,8 @@ public:
   }
 
   template <typename U>
-  friend std::ostream &operator<<(std::ostream &os, const AddWinsSet<U> &obj) {
+  friend std::ostream &operator<<(std::ostream &os,
+                                  const LastWriterWinsSet<U> &obj) {
     auto elements = obj.elements();
 
     os << '{' << ' ';
