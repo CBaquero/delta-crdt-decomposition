@@ -1,37 +1,82 @@
 #pragma once
 
-#include <iostream>
-#include <vector> 
-#include <set>
+#include <ostream>
+#include <unordered_set>
+#include <vector>
 
-template <typename T>
-class gset
-{
-private:
-    std::set<T> s;
-
+template <typename T> class GrowOnlySet {
 public:
-    gset();
+  // TODO: add quality of life ctors.
+  GrowOnlySet() = default;
 
-    bool operator == (const gset<T> & o) const;
+  GrowOnlySet<T> insert(const T &value) {
+    GrowOnlySet<T> delta;
 
-    gset<T> add (const T& val);
+    auto [it, inserted] = m_elements.insert(value);
+    if (inserted)
+      delta.m_elements.insert(value);
 
-    template <typename U>
-    friend std::ostream& operator<<(std::ostream& os, const gset<U>& set);
+    return delta;
+  }
 
-    bool in (const T& val);
+  bool in(const T &value) const { return m_elements.count(value) == 1; }
 
-    template <typename... GSets>
-    void join (const GSets&... sets);
+  std::unordered_set<T> elements() const { return m_elements; }
 
-    void join(const std::vector<gset<T>>& sets);
+  template <typename... GrowOnlySet> void join(const GrowOnlySet &...sets) {
+    (..., m_elements.insert(sets.m_elements.begin(), sets.m_elements.end()));
+  }
 
-    gset<T> operator+(const gset<T>& other) const;
-    gset<T> operator-(const gset<T>& other) const;
+  void join(std::vector<GrowOnlySet<T>> &sets) {
+    for (const auto &set : sets) {
+      m_elements.insert(set.m_elements.begin(), set.m_elements.end());
+    }
+  }
 
-    std::vector<gset<T>> split() const;
+  std::vector<GrowOnlySet<T>> split() const {
+    std::vector<GrowOnlySet<T>> decompositions;
+    decompositions.reserve(m_elements.size());
+
+    for (const auto &value : m_elements) {
+      decompositions.emplace_back();
+      decompositions.back().m_elements.insert(value);
+    }
+
+    return decompositions;
+  }
+
+  bool operator==(const GrowOnlySet<T> &other) const {
+    return m_elements == other.m_elements;
+  }
+
+  GrowOnlySet<T> operator+(const GrowOnlySet<T> &other) const {
+    GrowOnlySet<T> result = *this;
+    result.join(other);
+
+    return result;
+  }
+
+  GrowOnlySet<T> operator-(const GrowOnlySet<T> &other) const {
+    GrowOnlySet<T> result = *this;
+
+    for (const auto &value : other.m_elements) {
+      result.m_elements.erase(value);
+    }
+
+    return result;
+  }
+
+  template <typename U>
+  friend std::ostream &operator<<(std::ostream &os, const GrowOnlySet<U> &obj) {
+    os << '{' << ' ';
+    for (const auto &value : obj.m_elements) {
+      os << value << ' ';
+    }
+    os << '}';
+
+    return os;
+  }
+
+private:
+  std::unordered_set<T> m_elements;
 };
-
-#include "gset.cpp"
-
