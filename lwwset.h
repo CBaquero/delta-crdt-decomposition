@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ostream>
 #include <stdexcept>
 #include <unordered_map>

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <ostream>
 #include <unordered_set>
