@@ -1,16 +1,16 @@
 CC = g++
 DEBUG = -g -v
-FLAGS = -std=c++17 -Wall -Wextra -Wconversion -Wunused -Wshadow -Werror -pedantic
+FLAGS = -std=c++20 -Wall -Wextra -Wconversion -Wunused -Wshadow -Werror -pedantic
 
-all: gset 2pset
+all: gset 2pset lwwset
 
-gset: test_gset.cpp gset.cpp gset.h
+gset: test_gset.cpp
 	$(CC) $(FLAGS) test_gset.cpp -o test_gset
 
-2pset: test_2pset.cpp 2pset.h
+2pset: test_2pset.cpp
 	$(CC) $(FLAGS) test_2pset.cpp -o test_2pset
 
-lwwset: test_lwwset.cpp lwwset.h
+lwwset: test_lwwset.cpp
 	$(CC) $(FLAGS) test_lwwset.cpp -o test_lwwset
 	
 clean:
