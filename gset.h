@@ -19,7 +19,7 @@ public:
     return delta;
   }
 
-  bool in(const T &value) const { return m_elements.count(value) == 1; }
+  bool contains(const T &value) const { return m_elements.contains(value); }
 
   std::unordered_set<T> elements() const { return m_elements; }
 

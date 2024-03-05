@@ -58,7 +58,7 @@ public:
     return delta;
   }
 
-  bool in(const T &value) const {
+  bool contains(const T &value) const {
     auto it = m_elements.find(value);
     return it != m_elements.end() && it->second.second;
   }

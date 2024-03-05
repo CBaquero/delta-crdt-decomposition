@@ -11,7 +11,7 @@ int main() {
   first.insert(10);
   first.insert(15);
 
-  bool in = first.in(5) && first.in(10) && first.in(15);
+  bool in = first.contains(5) && first.contains(10) && first.contains(15);
   std::cout << "insert test: " << (in ? "passed" : "failed") << std::endl;
 
   second.insert(20);

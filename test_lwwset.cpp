@@ -10,7 +10,7 @@ int main() {
   first.insert(5, 1);
   first.insert(10, 2);
 
-  bool in = first.in(5) && first.in(10);
+  bool in = first.contains(5) && first.contains(10);
   std::cout << "insert test: " << (in ? "passed" : "failed") << std::endl;
 
   try {
@@ -82,7 +82,7 @@ int main() {
   theirs.insert(3, 4);  // synchronized - not present
 
   auto optimal_delta = ours - theirs;
-  bool delta = optimal_delta.in(4) && optimal_delta.in(10) &&
+  bool delta = optimal_delta.contains(4) && optimal_delta.contains(10) &&
                optimal_delta.elements().size() == 2;
   std::cout << "delta test: " << (delta ? "passed" : "failed") << std::endl;
 

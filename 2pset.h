@@ -1,17 +1,18 @@
 #pragma once
 
-#include <iostream>
 #include <ostream>
 #include <unordered_set>
 #include <vector>
 
 template <typename T> class TwoPhaseSet {
+  using Delta = TwoPhaseSet<T>;
+
 public:
   // TODO: add quality of life ctors.
   TwoPhaseSet() = default;
 
-  TwoPhaseSet<T> insert(const T &value) {
-    TwoPhaseSet<T> delta;
+  Delta insert(const T &value) {
+    Delta delta;
 
     auto [it, inserted] = m_added.insert(value);
     if (inserted)
@@ -20,8 +21,8 @@ public:
     return delta;
   }
 
-  TwoPhaseSet<T> remove(const T &value) {
-    TwoPhaseSet<T> delta;
+  Delta remove(const T &value) {
+    Delta delta;
 
     auto [it, inserted] = m_removed.insert(value);
     if (inserted)
@@ -30,8 +31,8 @@ public:
     return delta;
   }
 
-  bool in(const T &value) const {
-    return m_added.count(value) == 1 && m_removed.count(value) == 0;
+  bool contains(const T &value) const {
+    return m_added.contains(value) && !m_removed.contains(value);
   }
 
   std::unordered_set<T> elements() const {
@@ -39,7 +40,7 @@ public:
     std::unordered_set<T> result;
 
     for (const auto &value : m_added) {
-      if (m_removed.count(value) == 0)
+      if (!m_removed.contains(value))
         result.insert(value);
     }
 
