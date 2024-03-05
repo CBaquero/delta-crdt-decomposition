@@ -1,52 +1,58 @@
-#include <iostream>
 #include "gset.h"
+#include <algorithm>
+#include <iostream>
+#include <vector>
 
 int main() {
-    gset<int> set1, set2, set3, setMain;
+  GrowOnlySet<int> first, second, third;
+  GrowOnlySet<int> joined, op_joined, rejoined;
 
-    // Adding to set1
-    set1.add(5);
-    set1.add(10);
-    set1.add(15);
+  first.insert(5);
+  first.insert(10);
+  first.insert(15);
 
-    // Adding to set2
-    set2.add(20);
-    set2.add(25);
+  bool in = first.in(5) && first.in(10) && first.in(15);
+  std::cout << "insert test: " << (in ? "passed" : "failed") << std::endl;
 
-    // Adding to set3
-    set3.add(30);
-    set3.add(35);
+  second.insert(20);
+  second.insert(25);
 
-    // Checking if elements are in the sets
-    std::cout << "set1 contains 10: " << set1.in(10) << std::endl; // Expected output: 1 (true)
-    std::cout << "set1 contains 20: " << set1.in(20) << std::endl; // Expected output: 0 (false)
+  third.insert(30);
+  third.insert(35);
 
-    // Joining multiple sets
-    setMain.join(set1, set2, set3);
+  std::vector<int> expected({5, 10, 15, 20, 25, 30, 35});
 
-    // Checking if elements are in the main set after join
-    std::cout << "setMain contains 5: " << setMain.in(5) << std::endl;   // Expected output: 1 (true)
-    std::cout << "setMain contains 25: " << setMain.in(25) << std::endl; // Expected output: 1 (true)
-    std::cout << "setMain contains 30: " << setMain.in(30) << std::endl; // Expected output: 1 (true)
+  joined.join(first, second, third);
+  bool j = std::is_permutation(expected.begin(), expected.end(),
+                               joined.elements().begin());
+  std::cout << "join test: " << (j ? "passed" : "failed") << std::endl;
 
-    std::vector<gset<int>> setsToJoin = {set1, set2, set3};
-    setMain.join(setsToJoin);
+  op_joined = first + second + third;
+  bool add = std::is_permutation(expected.begin(), expected.end(),
+                                 op_joined.elements().begin());
+  std::cout << "union test: " << (add ? "passed" : "failed") << std::endl;
 
-    // Checking if elements are in the main set after join
-    std::cout << "setMain contains 5: " << setMain.in(5) << std::endl;   // Expected output: 1 (true)
-    std::cout << "setMain contains 25: " << setMain.in(25) << std::endl; // Expected output: 1 (true)
-    std::cout << "setMain contains 35: " << setMain.in(35) << std::endl; // Expected output: 1 (true)
+  std::vector<GrowOnlySet<int>> joinable_sets({first, second, third});
+  joined.join(joinable_sets);
+  bool rj = std::is_permutation(expected.begin(), expected.end(),
+                                joined.elements().begin());
+  std::cout << "rejoin test: " << (rj ? "passed" : "failed") << std::endl;
 
-    std::vector<gset<int>> setsToJoin2 = setMain.split();
-    gset<int> rejoinedSet;
-    rejoinedSet.join(setsToJoin2);
+  auto decompositions = joined.split();
+  rejoined.join(decompositions);
+  bool eq = (joined == rejoined);
+  std::clog << "joined: " << joined << '\n'
+            << "rejoined: " << rejoined << std::endl;
+  std::cout << "equality test: " << (eq ? "passed" : "failed") << std::endl;
 
-    std::cout << setMain << std::endl;
-    std::cout << rejoinedSet << std::endl;
+  auto first_and_second = rejoined - third;
+  bool s = (first_and_second + third) == rejoined;
+  std::clog << "first and second: " << first_and_second << std::endl;
+  std::cout << "split test: " << (s ? "passed" : "failed") << std::endl;
 
-    std::cout << rejoinedSet - set3 << std::endl;
-    
+  auto none = first_and_second - first - second;
+  bool empty = none.elements().empty();
+  std::cout << "empty test: " << (empty ? "passed" : "failed") << std::endl;
 
-    return 0;
+  return 0;
 }
-
