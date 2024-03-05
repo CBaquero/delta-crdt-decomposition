@@ -47,25 +47,22 @@ public:
     return result;
   }
 
-  template <typename... TwoPhaseSet>
-  void join(const TwoPhaseSet &...decompositions) {
-    (..., m_added.insert(decompositions.m_added.begin(),
-                         decompositions.m_added.end()));
-    (..., m_removed.insert(decompositions.m_removed.begin(),
-                           decompositions.m_removed.end()));
+  template <typename... Delta> void join(const Delta &...sets) {
+    (..., m_added.insert(sets.m_added.begin(), sets.m_added.end()));
+    (..., m_removed.insert(sets.m_removed.begin(), sets.m_removed.end()));
   }
 
-  void join(const std::vector<TwoPhaseSet<T>> &decompositions) {
-    for (const auto &set : decompositions) {
+  void join(const std::vector<Delta> &sets) {
+    for (const auto &set : sets) {
       m_added.insert(set.m_added.begin(), set.m_added.end());
       m_removed.insert(set.m_removed.begin(), set.m_removed.end());
     }
   }
 
-  std::vector<TwoPhaseSet<T>> split() const {
+  std::vector<Delta> split() const {
     auto present = elements();
 
-    std::vector<TwoPhaseSet<T>> decompositions;
+    std::vector<Delta> decompositions;
     decompositions.reserve(present.size() + m_removed.size());
 
     // add decompositions just for elements that have not been removed
@@ -89,16 +86,15 @@ public:
     return elements() == other.elements();
   }
 
-  TwoPhaseSet<T> operator+(const TwoPhaseSet<T> &other) const {
-    // warn: this performs a copy... should it?
-    TwoPhaseSet<T> result = *this;
+  Delta operator+(const Delta &other) const {
+    Delta result = *this;
     result.join(other);
 
     return result;
   }
 
-  TwoPhaseSet<T> operator-(const TwoPhaseSet<T> &other) const {
-    TwoPhaseSet<T> result = *this;
+  Delta operator-(const Delta &other) const {
+    Delta result = *this;
 
     for (const auto &value : other.m_added) {
       result.m_added.erase(value);

@@ -38,8 +38,7 @@ int main() {
                                  op_joined.elements().begin());
   std::cout << "union test: " << (add ? "passed" : "failed") << std::endl;
 
-  std::vector<TwoPhaseSet<int>> joinable_sets({first, second, third});
-  joined.join(joinable_sets);
+  joined.join({first, second, third});
   bool rj = std::is_permutation(expected.begin(), expected.end(),
                                 joined.elements().begin());
   std::cout << "rejoin test: " << (rj ? "passed" : "failed") << std::endl;

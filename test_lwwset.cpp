@@ -4,8 +4,8 @@
 #include <vector>
 
 int main() {
-  LastWriterWinsSet<int> first, second, third;
-  LastWriterWinsSet<int> joined, op_joined, rejoined;
+  LastWriterWinsSet<int, unsigned long long> first, second, third;
+  LastWriterWinsSet<int, unsigned long long> joined, op_joined, rejoined;
 
   first.insert(5, 1);
   first.insert(10, 2);
@@ -43,7 +43,7 @@ int main() {
                                  op_joined.elements().begin());
   std::cout << "union test: " << (add ? "passed" : "failed") << std::endl;
 
-  std::vector<LastWriterWinsSet<int>> joinable_sets({first, second, third});
+  std::vector joinable_sets({first, second, third});
   joined.join(joinable_sets);
   bool rj = std::is_permutation(expected.begin(), expected.end(),
                                 joined.elements().begin());
@@ -66,7 +66,7 @@ int main() {
   bool empty = none.elements().empty();
   std::cout << "empty test: " << (empty ? "passed" : "failed") << std::endl;
 
-  LastWriterWinsSet<int> ours, theirs;
+  LastWriterWinsSet<int, unsigned long long> ours, theirs;
 
   ours.insert(1, 1);
   ours.remove(1, 2);  // remote addition wins - not present

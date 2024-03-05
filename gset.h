@@ -5,12 +5,14 @@
 #include <vector>
 
 template <typename T> class GrowOnlySet {
+  using Delta = GrowOnlySet<T>;
+
 public:
   // TODO: add quality of life ctors.
   GrowOnlySet() = default;
 
-  GrowOnlySet<T> insert(const T &value) {
-    GrowOnlySet<T> delta;
+  Delta insert(const T &value) {
+    Delta delta;
 
     auto [it, inserted] = m_elements.insert(value);
     if (inserted)
@@ -23,18 +25,19 @@ public:
 
   std::unordered_set<T> elements() const { return m_elements; }
 
-  template <typename... GrowOnlySet> void join(const GrowOnlySet &...sets) {
-    (..., m_elements.insert(sets.m_elements.begin(), sets.m_elements.end()));
+  template <typename... Delta> void join(const Delta &...deltas) {
+    (...,
+     m_elements.insert(deltas.m_elements.begin(), deltas.m_elements.end()));
   }
 
-  void join(std::vector<GrowOnlySet<T>> &sets) {
-    for (const auto &set : sets) {
+  void join(const std::vector<Delta> &deltas) {
+    for (const auto &set : deltas) {
       m_elements.insert(set.m_elements.begin(), set.m_elements.end());
     }
   }
 
-  std::vector<GrowOnlySet<T>> split() const {
-    std::vector<GrowOnlySet<T>> decompositions;
+  std::vector<Delta> split() const {
+    std::vector<Delta> decompositions;
     decompositions.reserve(m_elements.size());
 
     for (const auto &value : m_elements) {
@@ -45,19 +48,19 @@ public:
     return decompositions;
   }
 
-  bool operator==(const GrowOnlySet<T> &other) const {
+  bool operator==(const Delta &other) const {
     return m_elements == other.m_elements;
   }
 
-  GrowOnlySet<T> operator+(const GrowOnlySet<T> &other) const {
-    GrowOnlySet<T> result = *this;
+  Delta operator+(const Delta &other) const {
+    Delta result = *this;
     result.join(other);
 
     return result;
   }
 
-  GrowOnlySet<T> operator-(const GrowOnlySet<T> &other) const {
-    GrowOnlySet<T> result = *this;
+  Delta operator-(const Delta &other) const {
+    Delta result = *this;
 
     for (const auto &value : other.m_elements) {
       result.m_elements.erase(value);
