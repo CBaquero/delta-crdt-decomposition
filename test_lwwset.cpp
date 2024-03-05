@@ -1,11 +1,12 @@
 #include "lwwset.h"
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
 
-int main() {
-  LastWriterWinsSet<int, unsigned long long> first, second, third;
-  LastWriterWinsSet<int, unsigned long long> joined, op_joined, rejoined;
+int main(void) {
+  delta::LastWriterWinsSet<int, unsigned long long> first, second, third;
+  delta::LastWriterWinsSet<int, unsigned long long> joined, op_joined, rejoined;
 
   first.insert(5, 1);
   first.insert(10, 2);
@@ -66,7 +67,7 @@ int main() {
   bool empty = none.elements().empty();
   std::cout << "empty test: " << (empty ? "passed" : "failed") << std::endl;
 
-  LastWriterWinsSet<int, unsigned long long> ours, theirs;
+  delta::LastWriterWinsSet<int, unsigned long long> ours, theirs;
 
   ours.insert(1, 1);
   ours.remove(1, 2);  // remote addition wins - not present

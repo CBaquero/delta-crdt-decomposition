@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <vector>
 
+namespace delta {
+
 template <typename T> class GrowOnlySet {
   using Delta = GrowOnlySet<T>;
 
@@ -83,3 +85,5 @@ public:
 private:
   std::unordered_set<T> m_elements;
 };
+
+} // namespace delta

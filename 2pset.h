@@ -4,6 +4,8 @@
 #include <unordered_set>
 #include <vector>
 
+namespace delta {
+
 template <typename T> class TwoPhaseSet {
   using Delta = TwoPhaseSet<T>;
 
@@ -125,3 +127,5 @@ private:
   std::unordered_set<T> m_added;
   std::unordered_set<T> m_removed;
 };
+
+} // namespace delta

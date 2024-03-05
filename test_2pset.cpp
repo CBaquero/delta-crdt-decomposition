@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 
-int main() {
-  TwoPhaseSet<int> first, second, third;
-  TwoPhaseSet<int> joined, op_joined, rejoined;
+int main(void) {
+  delta::TwoPhaseSet<int> first, second, third;
+  delta::TwoPhaseSet<int> joined, op_joined, rejoined;
 
   first.insert(5);
   first.insert(10);

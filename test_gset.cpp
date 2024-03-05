@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 
-int main() {
-  GrowOnlySet<int> first, second, third;
-  GrowOnlySet<int> joined, op_joined, rejoined;
+int main(void) {
+  delta::GrowOnlySet<int> first, second, third;
+  delta::GrowOnlySet<int> joined, op_joined, rejoined;
 
   first.insert(5);
   first.insert(10);

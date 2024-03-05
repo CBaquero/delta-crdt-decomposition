@@ -7,6 +7,8 @@
 #include <utility>
 #include <vector>
 
+namespace delta {
+
 template <typename T, typename Timestamp>
   requires std::totally_ordered<Timestamp>
 class LastWriterWinsSet {
@@ -173,3 +175,5 @@ private:
   // key order is not maintained but allows for faster lookup and insertion
   std::unordered_map<T, Tag> m_elements;
 };
+
+} // namespace delta
