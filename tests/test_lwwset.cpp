@@ -4,7 +4,8 @@
 #include <stdexcept>
 #include <vector>
 
-int main(void) {
+int main() {
+  // NOLINTBEGIN (*-readability)
   delta::LastWriterWinsSet<int, unsigned long long> first, second, third;
   delta::LastWriterWinsSet<int, unsigned long long> joined, op_joined, rejoined;
 
@@ -89,4 +90,5 @@ int main(void) {
 
   int errors = !insert + !join + !add + !rejoin + !split + !empty + !delta;
   return errors;
+  // NOLINTEND (*-readability)
 }

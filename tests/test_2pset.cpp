@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 
-int main(void) {
+int main() {
+  // NOLINTBEGIN (*-readability)
   delta::TwoPhaseSet<int> first, second, third;
   delta::TwoPhaseSet<int> joined, op_joined, rejoined;
 
@@ -62,4 +63,5 @@ int main(void) {
   int errors =
       !insert + !remove + !join + !add + !rejoin + !eq + !split + !empty;
   return errors;
+  // NOLINTEND (*-readability)
 }

@@ -3,7 +3,8 @@
 #include <iostream>
 #include <vector>
 
-int main(void) {
+int main() {
+  // NOLINTBEGIN (*-readability)
   delta::GrowOnlySet<int> first, second, third;
   delta::GrowOnlySet<int> joined, op_joined, rejoined;
 
@@ -55,4 +56,5 @@ int main(void) {
 
   int errors = !insert + !join + !add + !rejoin + !eq + !split + !empty;
   return errors;
+  // NOLINTEND (*-readability)
 }
