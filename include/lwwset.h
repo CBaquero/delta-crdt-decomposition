@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ostream>
 #include <stdexcept>
 #include <unordered_map>
@@ -5,8 +7,12 @@
 #include <utility>
 #include <vector>
 
-template <typename T, typename Timestamp = unsigned long long>
+namespace delta {
+
+template <typename T, typename Timestamp>
+  requires std::totally_ordered<Timestamp>
 class LastWriterWinsSet {
+  using Delta = LastWriterWinsSet<T, Timestamp>;
   using Tag = std::pair<Timestamp, bool>;
 
 public:
@@ -14,8 +20,8 @@ public:
   // TODO: add quality of life ctors.
   LastWriterWinsSet() = default;
 
-  LastWriterWinsSet<T> insert(const T &value, const Timestamp timestamp) {
-    LastWriterWinsSet<T> delta;
+  Delta insert(const T &value, const Timestamp timestamp) {
+    Delta delta;
 
     auto [it, inserted] = m_elements.try_emplace(value, timestamp, true);
 
@@ -36,8 +42,8 @@ public:
     return delta;
   }
 
-  LastWriterWinsSet<T> remove(const T &value, const Timestamp timestamp) {
-    LastWriterWinsSet<T> delta;
+  Delta remove(const T &value, const Timestamp timestamp) {
+    Delta delta;
 
     auto [it, inserted] = m_elements.try_emplace(value, timestamp, true);
 
@@ -56,7 +62,7 @@ public:
     return delta;
   }
 
-  bool in(const T &value) const {
+  bool contains(const T &value) const {
     auto it = m_elements.find(value);
     return it != m_elements.end() && it->second.second;
   }
@@ -73,13 +79,13 @@ public:
     return result;
   }
 
-  template <typename... AddWinsSet> void join(const AddWinsSet &...others) {
+  template <typename... Delta> void join(const Delta &...deltas) {
     // idea: use iterators to receive decompositions or a initializer_list
-    join({others...});
+    join({deltas...});
   }
 
-  void join(const std::vector<LastWriterWinsSet<T>> &decompositions) {
-    for (const auto &set : decompositions) {
+  void join(const std::vector<Delta> &deltas) {
+    for (const auto &set : deltas) {
       for (const auto &element : set.m_elements) {
         auto [it, inserted] = m_elements.insert(element);
         if (!inserted)
@@ -88,8 +94,8 @@ public:
     }
   }
 
-  std::vector<LastWriterWinsSet<T>> split() const {
-    std::vector<LastWriterWinsSet<T>> decompositions;
+  std::vector<Delta> split() const {
+    std::vector<Delta> decompositions;
     decompositions.reserve(m_elements.size());
 
     for (const auto &element : m_elements) {
@@ -100,13 +106,13 @@ public:
     return decompositions;
   }
 
-  bool operator==(const LastWriterWinsSet<T> &other) const {
+  bool operator==(const Delta &other) const {
     // the semantics of this operator are a bit foggy...
     return elements() == other.elements();
   }
 
-  LastWriterWinsSet<T> operator+(const LastWriterWinsSet<T> &other) const {
-    LastWriterWinsSet<T> result = *this;
+  Delta operator+(const Delta &other) const {
+    Delta result = *this;
 
     for (const auto &element : other.m_elements) {
       auto [it, inserted] = result.m_elements.insert(element);
@@ -117,8 +123,8 @@ public:
     return result;
   }
 
-  LastWriterWinsSet<T> operator-(const LastWriterWinsSet<T> &other) const {
-    LastWriterWinsSet<T> result = *this;
+  Delta operator-(const Delta &other) const {
+    Delta result = *this;
 
     for (const auto &[value, tag] : other.m_elements) {
       // element is not present in the remote set, keep it
@@ -140,9 +146,9 @@ public:
     return result;
   }
 
-  template <typename U>
+  template <typename U, typename V>
   friend std::ostream &operator<<(std::ostream &os,
-                                  const LastWriterWinsSet<U> &obj) {
+                                  const LastWriterWinsSet<U, V> &obj) {
     auto elements = obj.elements();
 
     os << '{' << ' ';
@@ -169,3 +175,5 @@ private:
   // key order is not maintained but allows for faster lookup and insertion
   std::unordered_map<T, Tag> m_elements;
 };
+
+} // namespace delta

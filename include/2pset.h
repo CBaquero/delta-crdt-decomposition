@@ -1,15 +1,20 @@
-#include <iostream>
+#pragma once
+
 #include <ostream>
 #include <unordered_set>
 #include <vector>
 
+namespace delta {
+
 template <typename T> class TwoPhaseSet {
+  using Delta = TwoPhaseSet<T>;
+
 public:
   // TODO: add quality of life ctors.
   TwoPhaseSet() = default;
 
-  TwoPhaseSet<T> insert(const T &value) {
-    TwoPhaseSet<T> delta;
+  Delta insert(const T &value) {
+    Delta delta;
 
     auto [it, inserted] = m_added.insert(value);
     if (inserted)
@@ -18,8 +23,8 @@ public:
     return delta;
   }
 
-  TwoPhaseSet<T> remove(const T &value) {
-    TwoPhaseSet<T> delta;
+  Delta remove(const T &value) {
+    Delta delta;
 
     auto [it, inserted] = m_removed.insert(value);
     if (inserted)
@@ -28,8 +33,8 @@ public:
     return delta;
   }
 
-  bool in(const T &value) const {
-    return m_added.count(value) == 1 && m_removed.count(value) == 0;
+  bool contains(const T &value) const {
+    return m_added.contains(value) && !m_removed.contains(value);
   }
 
   std::unordered_set<T> elements() const {
@@ -37,32 +42,29 @@ public:
     std::unordered_set<T> result;
 
     for (const auto &value : m_added) {
-      if (m_removed.count(value) == 0)
+      if (!m_removed.contains(value))
         result.insert(value);
     }
 
     return result;
   }
 
-  template <typename... TwoPhaseSet>
-  void join(const TwoPhaseSet &...decompositions) {
-    (..., m_added.insert(decompositions.m_added.begin(),
-                         decompositions.m_added.end()));
-    (..., m_removed.insert(decompositions.m_removed.begin(),
-                           decompositions.m_removed.end()));
+  template <typename... Delta> void join(const Delta &...sets) {
+    (..., m_added.insert(sets.m_added.begin(), sets.m_added.end()));
+    (..., m_removed.insert(sets.m_removed.begin(), sets.m_removed.end()));
   }
 
-  void join(const std::vector<TwoPhaseSet<T>> &decompositions) {
-    for (const auto &set : decompositions) {
+  void join(const std::vector<Delta> &sets) {
+    for (const auto &set : sets) {
       m_added.insert(set.m_added.begin(), set.m_added.end());
       m_removed.insert(set.m_removed.begin(), set.m_removed.end());
     }
   }
 
-  std::vector<TwoPhaseSet<T>> split() const {
+  std::vector<Delta> split() const {
     auto present = elements();
 
-    std::vector<TwoPhaseSet<T>> decompositions;
+    std::vector<Delta> decompositions;
     decompositions.reserve(present.size() + m_removed.size());
 
     // add decompositions just for elements that have not been removed
@@ -86,16 +88,15 @@ public:
     return elements() == other.elements();
   }
 
-  TwoPhaseSet<T> operator+(const TwoPhaseSet<T> &other) const {
-    // warn: this performs a copy... should it?
-    TwoPhaseSet<T> result = *this;
+  Delta operator+(const Delta &other) const {
+    Delta result = *this;
     result.join(other);
 
     return result;
   }
 
-  TwoPhaseSet<T> operator-(const TwoPhaseSet<T> &other) const {
-    TwoPhaseSet<T> result = *this;
+  Delta operator-(const Delta &other) const {
+    Delta result = *this;
 
     for (const auto &value : other.m_added) {
       result.m_added.erase(value);
@@ -126,3 +127,5 @@ private:
   std::unordered_set<T> m_added;
   std::unordered_set<T> m_removed;
 };
+
+} // namespace delta
