@@ -11,8 +11,8 @@ int main(void) {
   first.insert(5, 1);
   first.insert(10, 2);
 
-  bool in = first.contains(5) && first.contains(10);
-  std::cout << "insert test: " << (in ? "passed" : "failed") << std::endl;
+  bool insert = first.contains(5) && first.contains(10);
+  std::cout << "insert test: " << (insert ? "passed" : "failed") << std::endl;
 
   try {
     std::clog << "before insertion: " << first << std::endl;
@@ -34,10 +34,10 @@ int main(void) {
   const std::vector<int> expected({5, 10, 15, 20, 25, 30});
 
   joined.join(first, second, third);
-  bool j = std::is_permutation(expected.begin(), expected.end(),
-                               joined.elements().begin());
-  std::cout << "remove test: " << (j ? "passed" : "failed") << std::endl;
-  std::cout << "join test: " << (j ? "passed" : "failed") << std::endl;
+  bool join = std::is_permutation(expected.begin(), expected.end(),
+                                  joined.elements().begin());
+  std::cout << "remove test: " << (join ? "passed" : "failed") << std::endl;
+  std::cout << "join test: " << (join ? "passed" : "failed") << std::endl;
 
   op_joined = first + second + third;
   bool add = std::is_permutation(expected.begin(), expected.end(),
@@ -46,9 +46,9 @@ int main(void) {
 
   std::vector joinable_sets({first, second, third});
   joined.join(joinable_sets);
-  bool rj = std::is_permutation(expected.begin(), expected.end(),
-                                joined.elements().begin());
-  std::cout << "rejoin test: " << (rj ? "passed" : "failed") << std::endl;
+  bool rejoin = std::is_permutation(expected.begin(), expected.end(),
+                                    joined.elements().begin());
+  std::cout << "rejoin test: " << (rejoin ? "passed" : "failed") << std::endl;
 
   auto joinable_sets2 = joined.split();
   rejoined.join(joinable_sets2);
@@ -59,9 +59,9 @@ int main(void) {
             << std::endl;
 
   auto first_and_second = rejoined - third;
-  bool s = (first_and_second + third) == rejoined;
+  bool split = (first_and_second + third) == rejoined;
   std::clog << "first and second: " << first_and_second << std::endl;
-  std::cout << "split test: " << (s ? "passed" : "failed") << std::endl;
+  std::cout << "split test: " << (split ? "passed" : "failed") << std::endl;
 
   auto none = first_and_second - first - second;
   bool empty = none.elements().empty();
@@ -87,5 +87,6 @@ int main(void) {
                optimal_delta.elements().size() == 2;
   std::cout << "delta test: " << (delta ? "passed" : "failed") << std::endl;
 
-  return 0;
+  int errors = !insert + !join + !add + !rejoin + !split + !empty + !delta;
+  return errors;
 }

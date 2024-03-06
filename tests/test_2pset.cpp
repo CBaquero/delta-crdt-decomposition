@@ -11,14 +11,14 @@ int main(void) {
   first.insert(10);
   first.insert(15);
 
-  bool in = first.contains(5) && first.contains(10) && first.contains(15);
-  std::cout << "insert test: " << (in ? "passed" : "failed") << std::endl;
+  bool insert = first.contains(5) && first.contains(10) && first.contains(15);
+  std::cout << "insert test: " << (insert ? "passed" : "failed") << std::endl;
 
   first.insert(10);
   first.remove(15);
 
-  bool rm = first.contains(5) && first.contains(10) && !first.contains(15);
-  std::cout << "remove test: " << (rm ? "passed" : "failed") << std::endl;
+  bool remove = first.contains(5) && first.contains(10) && !first.contains(15);
+  std::cout << "remove test: " << (remove ? "passed" : "failed") << std::endl;
 
   second.insert(15); // cannot be re-added when joinning
   second.insert(20);
@@ -29,9 +29,9 @@ int main(void) {
   std::vector<int> expected({5, 10, 20, 25, 30});
 
   joined.join(first, second, third);
-  bool j = std::is_permutation(expected.begin(), expected.end(),
-                               joined.elements().begin());
-  std::cout << "join test: " << (j ? "passed" : "failed") << std::endl;
+  bool join = std::is_permutation(expected.begin(), expected.end(),
+                                  joined.elements().begin());
+  std::cout << "join test: " << (join ? "passed" : "failed") << std::endl;
 
   op_joined = first + second + third;
   bool add = std::is_permutation(expected.begin(), expected.end(),
@@ -39,26 +39,27 @@ int main(void) {
   std::cout << "union test: " << (add ? "passed" : "failed") << std::endl;
 
   joined.join({first, second, third});
-  bool rj = std::is_permutation(expected.begin(), expected.end(),
-                                joined.elements().begin());
-  std::cout << "rejoin test: " << (rj ? "passed" : "failed") << std::endl;
+  bool rejoin = std::is_permutation(expected.begin(), expected.end(),
+                                    joined.elements().begin());
+  std::cout << "rejoin test: " << (rejoin ? "passed" : "failed") << std::endl;
 
   auto joinable_sets2 = joined.split();
   rejoined.join(joinable_sets2);
-
+  bool eq = (joined == rejoined);
   std::clog << "joined: " << joined << '\n'
             << "rejoined: " << rejoined << std::endl;
-  std::cout << "equality test: " << (joined == rejoined ? "passed" : "failed")
-            << std::endl;
+  std::cout << "equality test: " << (eq ? "passed" : "failed") << std::endl;
 
   auto first_and_second = rejoined - third;
-  bool s = (first_and_second + third) == rejoined;
+  bool split = (first_and_second + third) == rejoined;
   std::clog << "first and second: " << first_and_second << std::endl;
-  std::cout << "split test: " << (s ? "passed" : "failed") << std::endl;
+  std::cout << "split test: " << (split ? "passed" : "failed") << std::endl;
 
   auto none = first_and_second - first - second;
   bool empty = none.elements().empty();
   std::cout << "empty test: " << (empty ? "passed" : "failed") << std::endl;
 
-  return 0;
+  int errors =
+      !insert + !remove + !join + !add + !rejoin + !eq + !split + !empty;
+  return errors;
 }
